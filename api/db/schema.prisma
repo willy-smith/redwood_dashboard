@@ -1,0 +1,48 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider        = "prisma-client-js"
+  binaryTargets   = "native"
+  previewFeatures = ["selectRelationCount", "orderByRelation"]
+}
+
+model Course {
+  id          Int          @id @default(autoincrement())
+  title       String
+  description String
+  courseCode  String
+  grades      Grade[]
+  instructors Instructor[]
+  students    Student[]
+}
+
+model Instructor {
+  id        Int      @id @default(autoincrement())
+  firstName String
+  lastName  String
+  courses   Course[]
+}
+
+model Grade {
+  id Int @id @default(autoincrement())
+
+  letter    String
+  percent   Int
+  course    Course  @relation(fields: [courseId], references: [id])
+  courseId  Int
+  student   Student @relation(fields: [studentId], references: [id])
+  studentId Int
+}
+
+model Student {
+  id        Int       @id @default(autoincrement())
+  firstName String
+  lastName  String
+  email     String    @unique
+  courses   Course[]
+  grade     Grade[]
+  createdAt DateTime? @default(now())
+}
